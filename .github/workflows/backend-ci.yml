@@ -1,0 +1,41 @@
+name: Backend CI
+
+# backend/ ディレクトリ内のファイルが変更された場合のみ実行
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'backend/**'
+  pull_request:
+    paths:
+      - 'backend/**'
+
+jobs:
+  backend-ci:
+    name: Backend CI
+    runs-on: ubuntu-latest
+    
+    steps:
+      # ソースコードをチェックアウト
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      # バックエンドのComposite Actionを実行
+      - name: Run Backend CI
+        uses: ./backend  # backend/action.yml を呼び出し
+
+  # バックエンド特有のデプロイメント処理
+  deploy:
+    name: Deploy Backend
+    runs-on: ubuntu-latest
+    needs: backend-ci
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Deploy to Production
+        run: echo "🚀 Deploying backend to production..."

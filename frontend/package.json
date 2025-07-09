@@ -1,0 +1,14 @@
+{
+  "name": "frontend-app",
+  "version": "1.0.0",
+  "description": "Frontend application for monorepo sample",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "node test/test.js",
+    "build": "echo 'Building frontend...'",
+    "lint": "echo 'Linting frontend...'"
+  },
+  "devDependencies": {
+    "jest": "^29.0.0"
+  }
+}

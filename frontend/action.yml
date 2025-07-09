@@ -1,0 +1,47 @@
+name: 'Frontend CI Action'
+description: 'フロントエンドプロジェクトのCI処理（テスト、ビルド、リント）'
+
+# Composite Action として定義
+runs:
+  using: 'composite'
+  steps:
+    # Node.js のセットアップ
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+    
+    # 依存関係のインストール
+    - name: Install dependencies
+      run: npm ci
+      shell: bash
+      working-directory: frontend
+    
+    # リンティング実行
+    - name: Run linting
+      run: npm run lint
+      shell: bash
+      working-directory: frontend
+    
+    # テスト実行
+    - name: Run tests
+      run: npm test
+      shell: bash
+      working-directory: frontend
+    
+    # ビルド実行
+    - name: Build application
+      run: npm run build
+      shell: bash
+      working-directory: frontend
+    
+    # 追加のフロントエンド固有処理
+    - name: Generate coverage report
+      run: echo "Coverage report generated for frontend"
+      shell: bash
+      
+    - name: Validate build artifacts
+      run: echo "Build artifacts validated for frontend"
+      shell: bash

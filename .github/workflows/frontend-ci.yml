@@ -1,0 +1,41 @@
+name: Frontend CI
+
+# frontend/ ディレクトリ内のファイルが変更された場合のみ実行
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'frontend/**'
+  pull_request:
+    paths:
+      - 'frontend/**'
+
+jobs:
+  frontend-ci:
+    name: Frontend CI
+    runs-on: ubuntu-latest
+    
+    steps:
+      # ソースコードをチェックアウト
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      # フロントエンドのComposite Actionを実行
+      - name: Run Frontend CI
+        uses: ./frontend  # frontend/action.yml を呼び出し
+
+  # フロントエンド特有のデプロイメント処理
+  deploy:
+    name: Deploy Frontend
+    runs-on: ubuntu-latest
+    needs: frontend-ci
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Deploy to Production
+        run: echo "🚀 Deploying frontend to production..."
