@@ -13,16 +13,45 @@ on:
       - 'frontend/**'
 
 jobs:
-  # フロントエンドの Reusable Workflow を呼び出し
-  call-frontend-ci:
-    name: Call Frontend CI
-    uses: ./frontend/.github/workflows/ci.yml  # ★ サブディレクトリの Reusable Workflow を呼び出し
+  # 並列実行：リンティング
+  lint:
+    name: Frontend Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Run Frontend Lint
+        uses: ./frontend/actions/lint
+
+  # 並列実行：テスト
+  test:
+    name: Frontend Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Run Frontend Test
+        uses: ./frontend/actions/test
+
+  # 依存関係：lint と test の完了後にビルド
+  build:
+    name: Frontend Build
+    runs-on: ubuntu-latest
+    needs: [lint, test]  # ★ lint と test が並列実行された後に実行
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Run Frontend Build
+        uses: ./frontend/actions/build
 
   # フロントエンド特有のデプロイメント処理
   deploy:
     name: Deploy Frontend
     runs-on: ubuntu-latest
-    needs: call-frontend-ci
+    needs: build
     if: github.ref == 'refs/heads/main'
     
     steps:

@@ -1,0 +1,39 @@
+name: 'Backend Test Action'
+description: 'バックエンドのテスト処理'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.22'
+
+    - name: Cache Go modules
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cache/go-build
+          ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('backend/go.sum', 'backend/go.mod') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+
+    - name: Download dependencies
+      run: go mod download
+      shell: bash
+      working-directory: backend
+
+    - name: Run tests with coverage
+      run: go test -v -race -coverprofile=coverage.out ./...
+      shell: bash
+      working-directory: backend
+
+    - name: Display coverage
+      run: go tool cover -func=coverage.out
+      shell: bash
+      working-directory: backend
+
+    - name: Test results
+      run: echo "🧪 Tests completed successfully"
+      shell: bash
